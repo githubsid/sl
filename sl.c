@@ -53,6 +53,7 @@ int add_C51(int x);
 int add_D51(int x);
 int add_sl(int x);
 int add_C00(int x);
+int add_C01(int x);
 void option(char *str);
 int my_mvaddstr(int y, int x, char *str);
 
@@ -61,11 +62,13 @@ int ACCIDENT  = 0;
 int LOGO      = 0;
 int FLY       = 0;
 int C51       = 0;
+int LOCO_N    = 0;
+int vehicle   = 0;
 
-#define NUM_TRAINS (4)
+#define NUM_VEHICLES (5)
 
 typedef int (*addptr_sl)(int);
-addptr_sl ptr_sl[NUM_TRAINS];
+addptr_sl ptr_sl[NUM_VEHICLES];
 
 int my_mvaddstr(int y, int x, char *str)
 {
@@ -74,6 +77,37 @@ int my_mvaddstr(int y, int x, char *str)
     for ( ; *str != '\0'; ++str, ++x)
         if (mvaddch(y, x, *str) == ERR)  return ERR;
     return OK;
+}
+
+char *locos[NUM_VEHICLES] = {"  -n 1 : Logo\n",
+		 "  -n 1 : C51\n",
+		 "  -n 3 : D51\n",
+		 "  -n 4 : Opendrive blimp\n",
+		 "  -n 5 : Biplane\n"};
+
+void parse(char *str)
+{
+	int i;
+
+	LOCO_N = 1;
+	str++;
+	if (*str == '\0') {
+		fprintf(stderr, "Error: Usage -n N, 1 <= N <= %d\n", NUM_VEHICLES);
+		for (i = 0; i < NUM_VEHICLES; i++) {
+			fprintf(stderr, locos[i]);
+		}
+		exit(-1);
+	}
+	vehicle = atoi(str);
+	if (vehicle  == 0 || vehicle > NUM_VEHICLES) {
+		fprintf(stderr, "Error: Usage -n N, 1 <= N <= %d\n", NUM_VEHICLES);
+		for (i = 0; i < NUM_VEHICLES; i++) {
+			fprintf(stderr, locos[i]);
+		}
+		exit(-1);
+
+	}
+	vehicle--;
 }
 
 void option(char *str)
@@ -86,6 +120,7 @@ void option(char *str)
             case 'F': FLY      = 1; break;
             case 'l': LOGO     = 1; break;
             case 'c': C51      = 1; break;
+            case 'n': parse(str);   break;
             default:                break;
         }
     }
@@ -97,12 +132,13 @@ void init_slfuncs(void)
 	ptr_sl[1] = &add_C51;
 	ptr_sl[2] = &add_D51;
 	ptr_sl[3] = &add_C00;
+	ptr_sl[4] = &add_C01;
 }
 
 
 int main(int argc, char *argv[])
 {
-    int x, i, t;
+    int x, i;
 
     for (i = 1; i < argc; ++i) {
         if (*argv[i] == '-') {
@@ -118,9 +154,11 @@ int main(int argc, char *argv[])
     leaveok(stdscr, TRUE);
     scrollok(stdscr, FALSE);
 
-    srand(time(NULL));
-    t = rand() % NUM_TRAINS;
-    t = 3;
+    /* Pick a random vehicle if none specified */
+    if (vehicle == 0) {
+	    srand(time(NULL));
+	    vehicle = rand() % NUM_VEHICLES;
+    }
 
     for (x = COLS - 1; ; --x) {
         if (LOGO == 1) {
@@ -130,7 +168,7 @@ int main(int argc, char *argv[])
             if (add_C51(x) == ERR) break;
         }
         else {
-            if ((*ptr_sl[t])(x) == ERR) break;
+            if ((*ptr_sl[vehicle])(x) == ERR) break;
         }
         getch();
         refresh();
@@ -186,7 +224,10 @@ int add_sl(int x)
 int add_C00(int x)
 {
     static char *c00[C00PATTERNS][C00HEIGHT + 1]
-        = {{C00STR1, C00STR2, C00STR3, C00STR4, C00STR5, C00STR6, C00WH11}};
+        = {{C00STR1, C00STR2, C00STR3, C00STR4, C00STR5, C00STR6,
+	    C00WH11, C00DEL},
+           {C00STR1, C00STR2, C00STR3, C00STR4, C00STR5, C00STR6,
+	    C00WH12, C00DEL}};
 
     int y, i;
 
@@ -194,10 +235,29 @@ int add_C00(int x)
     y = LINES / 2 - 5;
 
     if (FLY == 1) {
-        y = (x / 7) + LINES - (COLS / 7) - D51HEIGHT;
+        y = (x / 6) + LINES - (COLS / 6) - C00HEIGHT;
     }
     for (i = 0; i <= C00HEIGHT; ++i) {
         my_mvaddstr(y + i, x, c00[(C00LENGTH + x) % C00PATTERNS][i]);
+    }
+    return OK;
+}
+
+int add_C01(int x)
+{
+    static char *c00[C01PATTERNS][C01HEIGHT + 1]
+        = {{C01STR1, C01STR2, C01STR3, C01WH11, C01DEL}};
+
+    int y, i;
+
+    if (x < - C01LENGTH)  return ERR;
+    y = LINES / 2 - 5;
+
+    if (FLY == 1) {
+        y = (x / 6) + LINES - (COLS / 6) - C01HEIGHT;
+    }
+    for (i = 0; i <= C01HEIGHT; ++i) {
+        my_mvaddstr(y + i, x, c00[(C01LENGTH + x) % C01PATTERNS][i]);
     }
     return OK;
 }

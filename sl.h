@@ -7,6 +7,10 @@
  *========================================
  */
 
+/* Credits:
+ * Ascii art for C00 modified from asciiart.eu/vehicles
+ */
+
 #define D51HEIGHT	10
 #define D51FUNNEL	 7
 #define D51LENGTH	83
@@ -150,18 +154,32 @@
 #define C51WH14 "\\_/         \\_/  \\____/  \\____/  \\____/      \\_/       "
 
 
-#define C00HEIGHT	 6
+#define C00HEIGHT	 7
 #define C00FUNNEL	 0
 #define C00LENGTH	77
-#define C00PATTERNS	 1
+#define C00PATTERNS	 2
 
 
 #define C00STR1   "       _..--=--..._ "
 #define C00STR2   "    .-'            '-.  .-.            +----------------------------------+ "
 #define C00STR3   "   /.'              '.\\/  /            |                            /|    | "
 #define C00STR4   "  |=-                -=| ( ------------+ O P E N  D R I V E S    .-. |    | "
-#define C00STR5   "   \\'.              .'/\\ \\            |                        (   )|    | "
+#define C00STR5   "   \\'.              .'/\\ \\             |                        (   )|    | "
 #define C00STR6   "    '-.,_____ _____.-'  '-'            +-------------------------'-'-+----+ "
 
-#define C00WH11   "       [_____]=8 "
+#define C00WH11   "       [_____]=8                                                               "
+#define C00WH12   "       [_____]=-                                                               "
+#define C00DEL    "                                                                               "
+
+#define C01HEIGHT	4
+#define C01FUNNEL	0
+#define C01LENGTH	23
+#define C01PATTERNS     1
+
+#define C01STR1  " ___                  "
+#define C01STR2  " |__\\_\\_o,___/ \\   "
+#define C01STR3  " ([___\\_\\_____-\\'  "
+
+#define C01WH11  " | o'                 "
+#define C01DEL   "                      "
 

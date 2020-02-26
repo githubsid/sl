@@ -14,6 +14,13 @@ all: sl
 sl: sl.c sl.h
 	$(CC) $(CFLAGS) -o sl sl.c -lncurses
 
+debug: sl.c sl.h
+	$(CC) -g -o sl sl.c -lncurses
+
+pdf:
+	groff -Tps -I shared -mandoc sl.1 > sl.ps
+	ps2pdf sl.ps
+
 clean:
 	rm -f sl
 
