@@ -3,9 +3,11 @@
  *        Copyright 1993,1998,2014-2015
  *                  Toyoda Masashi
  *                  (mtoyoda@acm.org)
- *        Last Modified: 2014/06/03
+ *        Last Modified: 2020/02/26
  *========================================
  */
+/* sl version 5.04 : Show random trains when defaults are used               */
+/*                                              by Sid Choudhuri  2020/02/26 */
 /* sl version 5.03 : Fix some more compiler warnings.                        */
 /*                                              by Ryan Jacobs    2015/01/19 */
 /* sl version 5.02 : Fix compiler warnings.                                  */
@@ -41,6 +43,8 @@
 #include <curses.h>
 #include <signal.h>
 #include <unistd.h>
+#include <time.h>
+#include <stdlib.h>
 #include "sl.h"
 
 void add_smoke(int y, int x);
@@ -51,10 +55,16 @@ int add_sl(int x);
 void option(char *str);
 int my_mvaddstr(int y, int x, char *str);
 
+
 int ACCIDENT  = 0;
 int LOGO      = 0;
 int FLY       = 0;
 int C51       = 0;
+
+#define NUM_TRAINS (3)
+
+typedef int (*addptr_sl)(int);
+addptr_sl ptr_sl[NUM_TRAINS];
 
 int my_mvaddstr(int y, int x, char *str)
 {
@@ -80,15 +90,24 @@ void option(char *str)
     }
 }
 
+void init_slfuncs(void)
+{
+	ptr_sl[0] = &add_sl;
+	ptr_sl[1] = &add_C51;
+	ptr_sl[2] = &add_D51;
+}
+
+
 int main(int argc, char *argv[])
 {
-    int x, i;
+    int x, i, t;
 
     for (i = 1; i < argc; ++i) {
         if (*argv[i] == '-') {
             option(argv[i] + 1);
         }
     }
+    init_slfuncs();
     initscr();
     signal(SIGINT, SIG_IGN);
     noecho();
@@ -96,6 +115,9 @@ int main(int argc, char *argv[])
     nodelay(stdscr, TRUE);
     leaveok(stdscr, TRUE);
     scrollok(stdscr, FALSE);
+
+    srand(time(NULL));
+    t = rand() % NUM_TRAINS;
 
     for (x = COLS - 1; ; --x) {
         if (LOGO == 1) {
@@ -105,7 +127,7 @@ int main(int argc, char *argv[])
             if (add_C51(x) == ERR) break;
         }
         else {
-            if (add_D51(x) == ERR) break;
+            if ((*ptr_sl[t])(x) == ERR) break;
         }
         getch();
         refresh();
