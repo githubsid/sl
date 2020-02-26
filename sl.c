@@ -52,6 +52,7 @@ void add_man(int y, int x);
 int add_C51(int x);
 int add_D51(int x);
 int add_sl(int x);
+int add_C00(int x);
 void option(char *str);
 int my_mvaddstr(int y, int x, char *str);
 
@@ -61,7 +62,7 @@ int LOGO      = 0;
 int FLY       = 0;
 int C51       = 0;
 
-#define NUM_TRAINS (3)
+#define NUM_TRAINS (4)
 
 typedef int (*addptr_sl)(int);
 addptr_sl ptr_sl[NUM_TRAINS];
@@ -95,6 +96,7 @@ void init_slfuncs(void)
 	ptr_sl[0] = &add_sl;
 	ptr_sl[1] = &add_C51;
 	ptr_sl[2] = &add_D51;
+	ptr_sl[3] = &add_C00;
 }
 
 
@@ -118,6 +120,7 @@ int main(int argc, char *argv[])
 
     srand(time(NULL));
     t = rand() % NUM_TRAINS;
+    t = 3;
 
     for (x = COLS - 1; ; --x) {
         if (LOGO == 1) {
@@ -180,6 +183,24 @@ int add_sl(int x)
     return OK;
 }
 
+int add_C00(int x)
+{
+    static char *c00[C00PATTERNS][C00HEIGHT + 1]
+        = {{C00STR1, C00STR2, C00STR3, C00STR4, C00STR5, C00STR6, C00WH11}};
+
+    int y, i;
+
+    if (x < - C00LENGTH)  return ERR;
+    y = LINES / 2 - 5;
+
+    if (FLY == 1) {
+        y = (x / 7) + LINES - (COLS / 7) - D51HEIGHT;
+    }
+    for (i = 0; i <= C00HEIGHT; ++i) {
+        my_mvaddstr(y + i, x, c00[(C00LENGTH + x) % C00PATTERNS][i]);
+    }
+    return OK;
+}
 
 int add_D51(int x)
 {
