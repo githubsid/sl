@@ -17,11 +17,17 @@ sl: sl.c sl.h
 debug: sl.c sl.h
 	$(CC) -g -o sl sl.c -lncurses
 
+man:
+	gzip < sl.1 > sl.1.gz
+
 pdf:
 	groff -Tps -I shared -mandoc sl.1 > sl.ps
 	ps2pdf sl.ps
+
+dist: sl man pdf
 
 clean:
 	rm -f sl
 
 distclean: clean
+	rm -f *.pdf *.ps *.gz

@@ -1,0 +1,8 @@
+Package: sl
+Version: 5.04-sid
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: libncurses5
+Maintainer: Sid Choudhuri <siddharthc@gmail.com>
+Description: Modified sl program
